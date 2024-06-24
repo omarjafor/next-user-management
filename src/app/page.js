@@ -3,7 +3,7 @@
 export default function Home() {
   return (
     <div>
-      <h1>Welcome to my Next.js app!</h1>
+      <h1>Server Actions! Next Js App</h1>
     </div>
   );
 }
