@@ -1,3 +1,4 @@
+'use client'
 import {
     Card,
     CardContent,
@@ -7,9 +8,33 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Button } from "../ui/button";
+import { deleteUserAction } from "@/app/actions";
+import toast from "react-hot-toast";
+import { useContext } from "react";
+import { UserContext } from "@/context";
 
 
 const SingleUser = ({ user }) => {
+    const { setCurrentEditedId, setOpenDialog, setUserFormData } = useContext(UserContext);
+
+    async function handleDelete(userId){
+        const result = await deleteUserAction(userId, '/user-management');
+        if(result?.success){
+            toast.success(result.message)
+        }
+    }
+
+    function handleEdit(user){
+        setOpenDialog(true);
+        setUserFormData({
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            email: user?.email,
+            address: user?.address
+        });
+        setCurrentEditedId(user?._id)
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -20,8 +45,8 @@ const SingleUser = ({ user }) => {
                 <p> {user?.email} </p>
             </CardContent>
             <CardFooter className='flex justify-between'>
-                <Button>Edit</Button>
-                <Button>Delete</Button>
+                <Button onClick={() => handleEdit(user)}>Edit</Button>
+                <Button onClick={() => handleDelete(user?._id)}>Delete</Button>
             </CardFooter>
         </Card>
 

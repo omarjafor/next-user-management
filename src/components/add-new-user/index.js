@@ -11,15 +11,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { addNewUserFormControl, initialFormData } from "../utils";
-import { addNewUserAction } from "@/app/actions";
+import { addNewUserAction, editUserAction } from "@/app/actions";
 import toast from "react-hot-toast";
+import { UserContext } from "@/context";
 
 
 const AddNewUser = () => {
-    const [openDialog, setOpenDialog] = useState(false);
-    const [userFromData, setUserFormData] = useState(initialFormData);
+    const { currentEditedId, setCurrentEditedId, openDialog, setOpenDialog, userFromData, setUserFormData } = useContext(UserContext);
 
     function handleButtonValid() {
         return Object.keys(userFromData).every(
@@ -28,10 +28,11 @@ const AddNewUser = () => {
     }
 
     async function handleAddNewUserAction(){
-        const result = await addNewUserAction(userFromData, '/user-management');
+        const result = currentEditedId !== null ? await editUserAction(currentEditedId, userFromData, '/user-management' ) : await addNewUserAction(userFromData, '/user-management');
         if(result?.success){
             setOpenDialog(false);
             setUserFormData(initialFormData);
+            setCurrentEditedId(null);
             toast.success(result.message);
         }
     }
@@ -42,12 +43,15 @@ const AddNewUser = () => {
             <Dialog open={openDialog} onOpenChange={() => {
                 setOpenDialog(false);
                 setUserFormData(initialFormData);
+                setCurrentEditedId(null);
             }}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogTitle>
+                            {currentEditedId ? 'Edit User Here':'Add New User'}
+                        </DialogTitle>
                         <DialogDescription>
-                            Create new user profile here. Click save when you're done.
+                            {currentEditedId ? 'Edit User' : 'Add New User'} profile here. Click save when you're done.
                         </DialogDescription>
                     </DialogHeader>
                     <form action={handleAddNewUserAction} className="grid gap-4 py-4">
